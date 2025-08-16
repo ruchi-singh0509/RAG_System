@@ -38,14 +38,14 @@ class RAGPipeline:
         self.openai_api_key = openai_api_key or self._get_config('OPENAI_API_KEY', '')
         self.model_name = model_name
         
-        # Initialize components
-        self._initialize_llm()
-        self._initialize_prompts()
-        
-        # Configuration
+        # Set configuration values first
         self.top_k = int(self._get_config('TOP_K_RETRIEVAL', 5))
         self.max_tokens = int(self._get_config('MAX_TOKENS', 1000))
         self.temperature = float(self._get_config('TEMPERATURE', 0.7))
+        
+        # Initialize components
+        self._initialize_llm()
+        self._initialize_prompts()
         
         logger.info(f"RAG Pipeline initialized with model: {self.model_name}")
     
