@@ -35,7 +35,7 @@ class RAGPipeline:
         
         # Configuration
         self.vector_store = vector_store
-        self.openai_api_key = openai_api_key or self._get_config('OPENAI_API_KEY')
+        self.openai_api_key = openai_api_key or self._get_config('OPENAI_API_KEY', '')
         self.model_name = model_name
         
         # Initialize components
@@ -49,7 +49,7 @@ class RAGPipeline:
         
         logger.info(f"RAG Pipeline initialized with model: {self.model_name}")
     
-    def _get_config(self, key: str, default_value: str) -> str:
+    def _get_config(self, key: str, default_value: str = '') -> str:
         """Get configuration value from Streamlit secrets or environment variables"""
         try:
             import streamlit as st
