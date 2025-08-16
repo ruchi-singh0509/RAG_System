@@ -167,7 +167,7 @@ Summary:"""
                 return create_error_response("Query contains no valid text")
             
             # Log query processing
-            log_processing_step("query_start", "query", {"query": cleaned_query})
+            log_processing_step("query_start", "general_query", {"query": cleaned_query})
             
             # Retrieve relevant chunks
             retrieval_result = self._retrieve_relevant_chunks(cleaned_query, filter_metadata)
@@ -197,7 +197,7 @@ Summary:"""
             }
             
             # Log query completion
-            log_processing_step("query_complete", "query", {
+            log_processing_step("query_complete", "general_query", {
                 "query": cleaned_query,
                 "sources_count": len(retrieved_chunks),
                 "answer_length": len(response_data['answer'])
