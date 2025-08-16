@@ -71,13 +71,16 @@ brew install tesseract
 cp .env.example .env
 # Edit .env with your OpenAI API key
 ```
+## 🚀 Deployment
 
-## 🚀 Usage
+### Streamlit Cloud
+1. Fork this repository
+2. Go to [share.streamlit.io](https://share.streamlit.io)
+3. Connect your GitHub account
+4. Select this repository
+5. Deploy!
 
-### Running the Application
-```bash
-streamlit run app.py
-```
+
 
 ### Using the System
 1. **Upload Documents**: Upload PDFs, images, or scanned documents
@@ -142,13 +145,7 @@ visual-document-rag/
 - Textbook content extraction
 - Academic document processing
 
-## 🤝 Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
 
 
 
