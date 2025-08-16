@@ -186,7 +186,7 @@ def cleanup_temp_files():
                 except Exception as e:
                     logger.warning(f"Failed to clean up temp file {temp_file}: {e}")
 
-def log_processing_step(step: str, document_id: str, details: Dict[str, Any] = None):
+def log_processing_step(step: str, document_id: Optional[str] = None, details: Dict[str, Any] = None):
     """Log processing step for monitoring and debugging"""
     log_entry = {
         'timestamp': datetime.now().isoformat(),
