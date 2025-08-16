@@ -13,14 +13,28 @@ logger = logging.getLogger(__name__)
 
 def setup_environment():
     """Setup environment variables and create necessary directories"""
-    from dotenv import load_dotenv
+    import streamlit as st
     
-    # Load environment variables
-    load_dotenv()
+    # Try to load from Streamlit secrets first, then fall back to .env
+    try:
+        # Check if running in Streamlit
+        if hasattr(st, 'secrets'):
+            # Use Streamlit secrets
+            faiss_dir = st.secrets.get('FAISS_PERSIST_DIRECTORY', './faiss_db')
+        else:
+            # Fall back to .env file for local development
+            from dotenv import load_dotenv
+            load_dotenv()
+            faiss_dir = os.getenv('FAISS_PERSIST_DIRECTORY', './faiss_db')
+    except Exception:
+        # Fallback to .env file
+        from dotenv import load_dotenv
+        load_dotenv()
+        faiss_dir = os.getenv('FAISS_PERSIST_DIRECTORY', './faiss_db')
     
     # Create necessary directories
     directories = [
-        os.getenv('FAISS_PERSIST_DIRECTORY', './faiss_db'),
+        faiss_dir,
         './uploads',
         './temp',
         './logs'

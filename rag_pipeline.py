@@ -35,7 +35,7 @@ class RAGPipeline:
         
         # Configuration
         self.vector_store = vector_store
-        self.openai_api_key = openai_api_key or os.getenv('OPENAI_API_KEY')
+        self.openai_api_key = openai_api_key or self._get_config('OPENAI_API_KEY')
         self.model_name = model_name
         
         # Initialize components
@@ -43,11 +43,23 @@ class RAGPipeline:
         self._initialize_prompts()
         
         # Configuration
-        self.top_k = int(os.getenv('TOP_K_RETRIEVAL', 5))
-        self.max_tokens = int(os.getenv('MAX_TOKENS', 1000))
-        self.temperature = float(os.getenv('TEMPERATURE', 0.7))
+        self.top_k = int(self._get_config('TOP_K_RETRIEVAL', 5))
+        self.max_tokens = int(self._get_config('MAX_TOKENS', 1000))
+        self.temperature = float(self._get_config('TEMPERATURE', 0.7))
         
         logger.info(f"RAG Pipeline initialized with model: {self.model_name}")
+    
+    def _get_config(self, key: str, default_value: str) -> str:
+        """Get configuration value from Streamlit secrets or environment variables"""
+        try:
+            import streamlit as st
+            if hasattr(st, 'secrets'):
+                return st.secrets.get(key, default_value)
+        except Exception:
+            pass
+        
+        # Fallback to environment variables
+        return os.getenv(key, default_value)
     
     def _initialize_llm(self):
         """Initialize language model"""

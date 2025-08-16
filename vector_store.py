@@ -31,8 +31,8 @@ class VectorStore:
         setup_environment()
         
         # Configuration
-        self.persist_directory = persist_directory or os.getenv('FAISS_PERSIST_DIRECTORY', './faiss_db')
-        self.model_name = model_name or os.getenv('MODEL_NAME', 'all-MiniLM-L6-v2')
+        self.persist_directory = persist_directory or self._get_config('FAISS_PERSIST_DIRECTORY', './faiss_db')
+        self.model_name = model_name or self._get_config('MODEL_NAME', 'all-MiniLM-L6-v2')
         
         # Create persist directory
         Path(self.persist_directory).mkdir(parents=True, exist_ok=True)
@@ -47,6 +47,18 @@ class VectorStore:
         self._load_metadata()
         
         logger.info(f"FAISS Vector Store initialized with model: {self.model_name}")
+    
+    def _get_config(self, key: str, default_value: str) -> str:
+        """Get configuration value from Streamlit secrets or environment variables"""
+        try:
+            import streamlit as st
+            if hasattr(st, 'secrets'):
+                return st.secrets.get(key, default_value)
+        except Exception:
+            pass
+        
+        # Fallback to environment variables
+        return os.getenv(key, default_value)
     
     def _initialize_embedding_model(self):
         """Initialize sentence transformer model"""
