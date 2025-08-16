@@ -63,13 +63,37 @@ class VectorStore:
     def _initialize_embedding_model(self):
         """Initialize sentence transformer model"""
         try:
-            self.embedding_model = SentenceTransformer(self.model_name)
+            # Handle PyTorch meta tensor issue
+            import torch
+            
+            # Check if CUDA is available and set device
+            if torch.cuda.is_available():
+                device = 'cuda'
+            else:
+                device = 'cpu'
+            
+            # Load model with specific device handling
+            self.embedding_model = SentenceTransformer(self.model_name, device=device)
+            
+            # Force model to device to avoid meta tensor issues
+            if hasattr(self.embedding_model, 'to'):
+                self.embedding_model = self.embedding_model.to(device)
+            
             self.embedding_dimension = self.embedding_model.get_sentence_embedding_dimension()
-            logger.info(f"Embedding model loaded: {self.model_name} (dim: {self.embedding_dimension})")
+            logger.info(f"Embedding model loaded: {self.model_name} (dim: {self.embedding_dimension}) on {device}")
             
         except Exception as e:
             logger.error(f"Failed to load embedding model: {e}")
-            raise
+            # Try fallback approach
+            try:
+                logger.info("Trying fallback model loading approach...")
+                self.embedding_model = SentenceTransformer(self.model_name, device='cpu')
+                self.embedding_model = self.embedding_model.to('cpu')
+                self.embedding_dimension = self.embedding_model.get_sentence_embedding_dimension()
+                logger.info(f"Fallback model loading successful: {self.model_name}")
+            except Exception as fallback_e:
+                logger.error(f"Fallback model loading also failed: {fallback_e}")
+                raise
     
     def _initialize_faiss_index(self):
         """Initialize FAISS index"""

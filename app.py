@@ -46,12 +46,50 @@ class RAGApp:
     
     def _initialize_components(self):
         try:
-            self.document_processor = DocumentProcessor()
-            self.vector_store = VectorStore()
-            self.rag_pipeline = RAGPipeline(self.vector_store)
+            # Initialize components step by step with better error handling
+            st.info("🔄 Initializing system components...")
+            
+            # Step 1: Document Processor
+            try:
+                self.document_processor = DocumentProcessor()
+                st.success("✅ Document Processor initialized")
+            except Exception as e:
+                st.error(f"❌ Document Processor failed: {str(e)}")
+                raise
+            
+            # Step 2: Vector Store (most likely to fail)
+            try:
+                self.vector_store = VectorStore()
+                st.success("✅ Vector Store initialized")
+            except Exception as e:
+                st.error(f"❌ Vector Store failed: {str(e)}")
+                st.warning("💡 This is often due to PyTorch model loading issues")
+                st.info("🔄 Trying alternative initialization...")
+                
+                # Try with a different model
+                try:
+                    import os
+                    os.environ['MODEL_NAME'] = 'paraphrase-MiniLM-L3-v2'
+                    self.vector_store = VectorStore()
+                    st.success("✅ Vector Store initialized with fallback model")
+                except Exception as fallback_e:
+                    st.error(f"❌ Fallback initialization also failed: {str(fallback_e)}")
+                    raise
+            
+            # Step 3: RAG Pipeline
+            try:
+                self.rag_pipeline = RAGPipeline(self.vector_store)
+                st.success("✅ RAG Pipeline initialized")
+            except Exception as e:
+                st.error(f"❌ RAG Pipeline failed: {str(e)}")
+                raise
+            
             st.session_state.system_initialized = True
+            st.success("🎉 All components initialized successfully!")
+            
         except Exception as e:
             st.error(f"Failed to initialize system: {str(e)}")
+            st.error("System initialization failed.")
     
     def run(self):
         st.markdown('<h1 class="main-header">📄 Visual Document Analysis RAG System</h1>', unsafe_allow_html=True)
